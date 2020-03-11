@@ -12,7 +12,7 @@ Vue.prototype.$browser = global.browser
 // Meili client
 const Meili = require('meilisearch')
 const config = {
-  host: 'http://192.168.1.50:7700'
+  host: 'http://0.0.0.0:7700'
 }
 Vue.prototype.$meili = new Meili.default(config)
 

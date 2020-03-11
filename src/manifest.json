@@ -21,6 +21,15 @@
     "chrome_style": true
   },
   "permissions": [
-    "history"
-  ]
+    "history",
+    "activeTab"
+  ],
+  "commands": {
+    "open-search-bar": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+L"
+      },
+      "description": "Send a toggle-search event"
+    }
+  }
 }

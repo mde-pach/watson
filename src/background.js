@@ -2,14 +2,13 @@ global.browser = require('webextension-polyfill')
 const Meili = require('meilisearch')
 
 const config = {
-  host: 'http://192.168.1.50:7700'
+  host: 'http://0.0.0.0:7700'
 }
 
 const meili = new Meili.default(config)
 
 function sendHistoryItem(historyItem) {
   var url = new URL(historyItem.url)
-
   meili.Index('test').addDocuments([{
     url: url.href,
     name: historyItem.title,
@@ -31,9 +30,21 @@ browser.history.onVisited.addListener((historyItem) => {
   sendHistoryItem(historyItem)
 })
 
+browser.commands.onCommand.addListener((command) => {
+  if (command === "open-search-bar") {
+    browser.tabs.insertCSS({
+      file: 'search-bar.css',
+      cssOrigin: 'user'
+    })
+    browser.tabs.executeScript({
+      file: 'search-bar.js',
+    })
+  }
+})
+
 browser.runtime.onInstalled.addListener(() => {
   var endDate = Date.now()
-  browser.history.search({text: "", maxResults: 5000}).then((historyItems) => {
+  browser.history.search({text: "", maxResults: 100}).then((historyItems) => {
     historyItems.forEach((historyItem) => {
       sendHistoryItem(historyItem)
     })
