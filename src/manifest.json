@@ -22,7 +22,8 @@
   },
   "permissions": [
     "history",
-    "activeTab"
+    "activeTab",
+    "*://*/*"
   ],
   "commands": {
     "open-search-bar": {

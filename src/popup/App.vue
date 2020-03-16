@@ -2,13 +2,16 @@
   <modal id="watson-search-bar" name="search-bar" class="watson-modal" classes="watson-container" width="40%" height="auto" adaptive @opened="modalOpened" @closed="modalClosed">
     <div class="watson-container">
       <input ref="search" placeholder="Search in your history..." type="search" v-model="query" class="watson-input"/>
-      <div class="rows" @keyup="changeItem" @mouseover="isActiveClassEnable = false">
+      <div id="watson-search-results" class="rows" @keyup="changeItem" @mouseover="isActiveClassEnable = false">
         <template v-for="(historyItem, index) in historyItems">
           <a :href="historyItem.url" target="_blank">
-            <div class="row card" :class='{"active": isActiveClassEnable === true && currentItem === index}'>
+            <div class="row card" :id="`watson-search-result-card-${index}`" :class='{"active": isActiveClassEnable === true && userItemIndex === index}'>
               <div class="card-content">
-                <p class="is-size-6 has-text-weight-bold card-title" v-html="historyItem.name"></p>
-                <div>{{ historyItem.hostname }}</div>
+                <p class="is-size-6 has-text-weight-bold card-title" v-html="historyItem._formatted.name"></p>
+                <div class="card-body">
+                  <div>{{ historyItem.hostname }}</div>
+                  <div>from {{ historyItem.browser_name }}</div>
+                </div>
               </div>
             </div>
           </a>
@@ -24,18 +27,33 @@ export default {
     return {
       isModalActive: true,
       query: '',
-      historyItems: {},
-      currentItem: 0,
+      historyItems: [],
+      requestedHistoryItemsCount: 0,
+      userItemIndex: 0,
       isActiveClassEnable: true
     }
   },
   watch: {
-    query(val) {
-      this.$meili.Index('test').search(val, {limit: 3, attributesToHighlight: ['name']}).then((response) => {
-        this.historyItems = response.hits
-      }).catch((error) => {
-        console.log(error)
-      })
+    async query(val) {
+      this.userItemIndex = 0
+      this.requestedHistoryItemsCount = 0
+      this.historyItems = await this.getNextHistoryItems(val)
+    },
+    userItemIndex(val) {
+      // TODO Need to opti that
+      var scrollView = document.getElementById('watson-search-results')
+      var element = document.getElementById(`watson-search-result-card-${val}`)
+      var scrollViewBottom = scrollView.clientHeight + scrollView.scrollTop
+      var elementTop = element.getBoundingClientRect().top - scrollView.getBoundingClientRect().top
+      var elementBottom = elementTop + element.clientHeight
+      
+      if (!(elementTop >= 0 && elementBottom <= scrollView.clientHeight)) {
+        var offset = elementBottom - scrollView.clientHeight
+        if (offset < 0) {
+          var offset = elementTop
+        }
+        scrollView.scrollBy({top: Math.ceil(offset)})
+      }
     }
   },
   mounted() {
@@ -45,21 +63,42 @@ export default {
   },
   methods: {
     modalOpened() {
-      document.addEventListener("keyup", this.changeItem)
+      document.addEventListener("keydown", this.changeItem)
       this.$refs.search.focus()
     },
     modalClosed() {
-      document.removeEventListener("keyup", this.changeItem)
+      document.removeEventListener("keydown", this.changeItem)
     },
-    changeItem(event) {
-      if (this.cleanActiveClass === false) {
-        this.isActiveClassEnable = true
+    async changeItem(event) {
+      if (event.code == 'ArrowDown') {
+        event.preventDefault()
+        if (this.isActiveClassEnable === false) {
+          this.isActiveClassEnable = true
+        } else if (this.userItemIndex < this.historyItems.length - 1) {
+          this.userItemIndex++
+        }
+      } else if (event.code == 'ArrowUp') {
+        event.preventDefault()
+        if (this.isActiveClassEnable === false) {
+          this.isActiveClassEnable = true
+        } else if (this.userItemIndex > 0) {
+          this.userItemIndex--
+        }
       }
-      if (event.code == 'ArrowDown' && this.currentItem < this.historyItems.length - 1) {
-          this.currentItem++
-      } else if (event.code == 'ArrowUp' && this.currentItem > 0) {
-          this.currentItem--
+      if (this.userItemIndex >= this.historyItems.length - 2) {
+        this.historyItems.push.apply(this.historyItems, await this.getNextHistoryItems(this.query))
       }
+    },
+    getNextHistoryItems(queryString, limit = 5) {
+      let promise = new Promise((resolve, reject) => {
+        this.$meili.Index('test').search(queryString, {limit: limit, offset: this.requestedHistoryItemsCount, attributesToHighlight: ['name']}).then((response) => {
+          this.requestedHistoryItemsCount += limit
+          resolve(response.hits)
+        }).catch((error) => {
+          reject(error)
+        })
+      })
+      return promise
     }
   }
 }
@@ -98,16 +137,15 @@ export default {
     }
 
     .rows {
+      overflow-y: auto !important;
       width: 100% !important;
+      max-height: 50vh !important;
       background-color: white !important;
       color: rgb(81, 81, 81) !important;
       display: flex;
       flex-direction: column;
       .row {
         margin: 0 !important;
-      }
-      em {
-        font-weight: 900;
       }
       .card {
         line-height: normal !important;
@@ -127,6 +165,11 @@ export default {
           font-family: "Montserrat", sans-serif !important;
           color: rgb(81, 81, 81) !important;
           margin: 2vh !important;
+          em {
+            font-style: normal !important;
+            font-weight: 900 !important;
+            text-decoration: underline !important;
+          }
           p {
             font-size: 3vh !important;
             margin: 0 !important;
@@ -139,10 +182,16 @@ export default {
           text-overflow: ellipsis;
           display: block;
           white-space: nowrap;
-        }  
+        }
+
+        .card-body {
+          display: flex;
+          justify-content: space-between;
+        }
       }
       .active {
         background-color: #EBEBEB !important;
+        pointer-events: none;
       }
     }
   }

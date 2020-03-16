@@ -1,16 +1,20 @@
 // content.js
 import Vue from 'vue';
-import App from './popup/App';
+import App from './App';
 import Buefy from 'buefy'
 // import 'buefy/dist/buefy.css'
 import vmodal from 'vue-js-modal'
+import axios from 'axios'
+import VueAxios from 'vue-axios'
 
 
-if (document.getElementById('watson-search-bar') === null) {
+const watson = document.getElementById('watson-search-bar')
+if (watson === null) {
   const app = document.createElement('div');
   app.id = 'app';
   document.body.prepend(app);
 
+  Vue.use(VueAxios, axios)
   Vue.use(Buefy)
   Vue.use(vmodal)
 
@@ -30,4 +34,6 @@ if (document.getElementById('watson-search-bar') === null) {
     el: '#app',
     render: h => h(App)
   })    
+} else {
+  watson.remove()
 }

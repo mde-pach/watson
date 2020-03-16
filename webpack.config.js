@@ -13,7 +13,7 @@ const config = {
     'background': './background.js',
     'popup/popup': './popup/popup.js',
     'options/options': './options/options.js',
-    'search-bar': './search-bar.js'
+    'popup/search-bar': './popup/search-bar.js'
   },
   output: {
     path: __dirname + '/dist',
@@ -31,7 +31,7 @@ const config = {
       {
         test: /\.js$/,
         loader: 'babel-loader',
-        exclude: /node_modules/,
+        // exclude: /node_modules/,
       },
       {
         test: /\.css$/,
