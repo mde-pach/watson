@@ -25,6 +25,12 @@
     "activeTab",
     "*://*/*"
   ],
+  "web_accessible_resources": [
+    "img/firefox.png",
+    "img/chrome.png",
+    "img/opera.png",
+    "img/edge.png"
+  ],
   "commands": {
     "open-search-bar": {
       "suggested_key": {
