@@ -23,7 +23,7 @@
     "jquery": "^3.4.1",
     "material-design-icons-iconfont": "^5.0.1",
     "meilisearch": "^0.8.12",
-    "minimist": "^1.2.2",
+    "minimist": "^1.2.5",
     "sweet-modal-vue": "^2.0.0",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
@@ -49,7 +49,7 @@
     "vue-loader": "^15.4.2",
     "vue-template-compiler": "^2.6.10",
     "web-ext-types": "^2.1.0",
-    "webpack": "^4.20.2",
+    "webpack": "^4.42.1",
     "webpack-cli": "^3.3.10",
     "webpack-extension-reloader": "^1.1.0"
   }
