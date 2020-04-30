@@ -20,7 +20,7 @@
     "axios": "^0.19.0",
     "buefy": "^0.8.12",
     "gmail-js": "^0.9.9",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "material-design-icons-iconfont": "^5.0.1",
     "meilisearch": "^0.8.12",
     "minimist": "^1.2.5",
