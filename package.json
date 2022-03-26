@@ -23,7 +23,7 @@
     "jquery": "^3.4.1",
     "material-design-icons-iconfont": "^5.0.1",
     "meilisearch": "^0.8.12",
-    "minimist": "^1.2.5",
+    "minimist": "^1.2.6",
     "sweet-modal-vue": "^2.0.0",
     "vue": "^2.6.10",
     "vue-axios": "^2.1.5",
